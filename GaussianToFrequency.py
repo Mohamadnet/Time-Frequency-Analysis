@@ -14,14 +14,58 @@ x2 = np.linspace(-L/2, L/2, n+1)
 # Spatial domain
 x = x2[:n]
 u = np.exp(-x**2)
-# np.fft.fft(x))
-%timeit DFT_slow(x)
-%timeit np.fft.fft(x)
-plt.plot(x, u, color='lightblue', linewidth=3)
+ut = np.fft.fft(u)
+
+#frequency domain
+k = [(2 * np.pi / L) * ii for jj in (np.arange(0,n/2), np.arange(-n/2, 0)) for ii in jj]
+
+g = np.cosh(x)**(-1)  # sech function
+# Derivative of sech
+gd = (-np.cosh(x)**(-1)) * np.tanh(x)
+# Second Derivative of sech
+g2d = (1./np.cosh(x)) - 2 * (1./np.cosh(x))**3
+
+gt = np.fft.fft(g)
+gds = np.fft.ifft(([1j*k[i] for i in range(len(k))])*gt)
+g2ds = np.fft.ifft(([1j*k[i]**2 for i in range(len(k))])*gt)
+'''
+timeit dft_slow(x)
+timeit fft(x)
+timeit np.fft.fft(x)
+'''
+plt.figure(1)
+
+plt.subplot(511)
+plt.plot(x, u, color='lightblue', linewidth=1)
+
+plt.subplot(512)
+plt.plot(x, ut, color='blue', linewidth=1)
+
+plt.subplot(513)
+plt.plot(x, np.fft.fftshift(np.abs(ut)), color='green', linewidth=1)
+# Spectral content of Gaussian
+plt.subplot(514)
+plt.plot(np.fft.fftshift(k), np.fft.fftshift(np.abs(ut)), color='green', linewidth=1)
+
+plt.subplot(515)
+plt.plot(x, gd, 'r', x, gds, 'g^')
+
 plt.xlim(-L/2, L/2)
 plt.show()
 
-def DFT_slow(x):
+
+
+
+'''
+Here are implementation of fft that it is worth reading, however, I am not using it in the main code
+I prefer use the default numpy fft
+'''
+
+'''
+x = np.random.random(1024)
+np.allclose(fft(x), np.fft.fft(x))
+'''
+def dft_slow(x):
     """Compute the discrete Fourier Transform of the 1D array x"""
     x = np.asarray(x, dtype=float)
     N = x.shape[0]
@@ -31,7 +75,7 @@ def DFT_slow(x):
     return np.dot(M, x)
 
 
-def FFT(x):
+def fft(x):
     """A recursive implementation of the 1D Cooley-Tukey FFT"""
     x = np.asarray(x, dtype=float)
     N = x.shape[0]
@@ -39,16 +83,16 @@ def FFT(x):
     if N % 2 > 0:
         raise ValueError("size of x must be a power of 2")
     elif N <= 32:  # this cutoff should be optimized
-        return DFT_slow(x)
+        return dft_slow(x)
     else:
-        X_even = FFT(x[::2])
-        X_odd = FFT(x[1::2])
+        X_even = fft(x[::2])
+        X_odd = fft(x[1::2])
         factor = np.exp(-2j * np.pi * np.arange(N) / N)
         return np.concatenate([X_even + factor[:N / 2] * X_odd,
                                X_even + factor[N / 2:] * X_odd])
 
 
-def FFT_vectorized(x):
+def fft_vectorized(x):
     """A vectorized, non-recursive version of the Cooley-Tukey FFT"""
     x = np.asarray(x, dtype=float)
     N = x.shape[0]
