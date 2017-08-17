@@ -14,13 +14,12 @@ x2 = np.linspace(-L/2, L/2, n+1)
 # Spatial domain
 x = x2[:n]
 u = np.exp(-x**2)
-
+# np.fft.fft(x))
+%timeit DFT_slow(x)
+%timeit np.fft.fft(x)
 plt.plot(x, u, color='lightblue', linewidth=3)
 plt.xlim(-L/2, L/2)
 plt.show()
-
-
-
 
 def DFT_slow(x):
     """Compute the discrete Fourier Transform of the 1D array x"""
