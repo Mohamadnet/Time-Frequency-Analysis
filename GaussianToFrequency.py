@@ -121,3 +121,54 @@ def fft_vectorized(x):
 
     return X.ravel()
 
+
+# Session Two / Filtering
+
+T = 30      # Time domain
+n = 512     # Sampling
+
+t2 = np.linspace(-T/2, T/2, n+1)
+t = t2[:n]
+# Actual frequency component   Cos0T , Cos1T, Cos2T ...
+k = [(2 * np.pi / T) * ii for jj in (np.arange(0,n/2), np.arange(-n/2, 0)) for ii in jj]
+u = np.cosh(t)**(-1)  # sech function
+ut = np.fft.fft(u)      # Heisenberg Uncertainty Principle is associated with fft
+
+# Adding white noise to the signal
+# if we add only real noise it will be symmetric in time domain
+# if we add only imaginary noise it will be asymmetric
+noise_coefficient = 10
+noise = np.random.normal(0, 1, n) + 1j*np.random.normal(0, 1, n)
+utn = ut + noise_coefficient * noise
+un = np.fft.ifft(utn)
+
+# Gaussian filter design
+filter = [np.exp(-k[ii]**2) for ii in range(len(k))]
+utnf = filter * utn
+
+unf = np.fft.ifft(utnf)
+threshold = [0.5 for ii in range(len(t))]
+
+
+plt.figure(2)
+
+plt.subplot(411)
+plt.plot(t, u, color='lightblue', linewidth=1)
+plt.plot(t, un, color='lightgreen', linewidth=1)
+
+plt.subplot(412)
+plt.plot(np.fft.fftshift(k), np.fft.fftshift(np.abs(ut)), color='blue', linewidth=1)
+plt.plot(np.fft.fftshift(k), np.fft.fftshift(np.abs(utn)), color='green', linewidth=1)
+
+plt.subplot(413)
+plt.plot(t, unf, color='black', linewidth=1)
+#plt.plot(t, un, color='lightgreen', linewidth=1)
+plt.plot(t, threshold, color='red', linewidth=1)
+
+plt.subplot(414)
+plt.plot(np.fft.fftshift(k), np.fft.fftshift(np.abs(filter)), color='blue', linewidth=1)
+plt.plot(np.fft.fftshift(k), np.fft.fftshift(np.abs(utn))/np.max(np.fft.fftshift(np.abs(utn))), color='green', linewidth=1)
+plt.plot(np.fft.fftshift(k), np.fft.fftshift(np.abs(utnf))/np.max(np.fft.fftshift(np.abs(utnf))), color='black', linewidth=1)
+
+plt.xlim(-T/2, T/2)
+plt.show()
