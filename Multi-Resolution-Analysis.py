@@ -10,7 +10,7 @@ from matplotlib.ticker import LinearLocator, FormatStrFormatter
 T = 10      # Time domain
 n = 2048    # Sampling
 
-t = np.linspace(-T/2, T/2, n+1)
+t = np.linspace(0, T, n+1)
 time = t[:n]
 #t = t2[:n]
 # Actual frequency component   Cos0T , Cos1T, Cos2T ...
@@ -20,6 +20,7 @@ signal = (3*np.sin(2*time) + 0.5*np.tanh(0.5*(time-3)) + 0.2*np.exp(-(time-4)**2
 freq = np.fft.fftfreq(signal.size, d=time[1]-time[0])
 fourier = np.fft.fft(signal)      # Heisenberg Uncertainty Principle is associated with fft
 freq_shift = np.fft.fftshift(freq)
+plt.figure(1)
 plt.subplot(211)
 plt.plot(time, signal, color='lightblue', linewidth=1)
 
@@ -30,5 +31,37 @@ plt.show()
 # Gabor Transform
 width = 1
 slide = np.arange(0, 10, 0.1)
+spec = np.zeros(shape=(len(slide),len(time)))
+plt.figure(2)
+for i in range(len(slide)):
+    filter = np.exp(-width*(time-slide[i])**2)
+    signal_filter = filter * signal
+    fourier_filterr = np.fft.fft(signal_filter)
 
+    plt.subplot(311)
+    plt.plot(time, signal, color='lightblue', linewidth=1)
+    plt.plot(time, filter, color='lightgreen', linewidth=1)
 
+    plt.subplot(312)
+    plt.plot(time, signal_filter, color='blue', linewidth=1)
+
+    plt.subplot(313)
+    plt.plot(freq_shift, np.fft.fftshift(np.abs(fourier_filterr)), color='green', linewidth=1)
+
+    spec[i, :] = np.fft.fftshift(np.abs(fourier_filterr))
+
+    plt.xlim(-T , T )
+    plt.pause(0.1)
+    plt.clf()
+
+# plotting the spectrum
+
+x, y = np.mgrid[:len(spec[:,1]), :len(spec[1,:])]   # 100 , 2048
+
+fig, ax = plt.subplots()
+ax.set_yscale('symlog')
+ax.pcolormesh(x, y, spec)
+plt.xlim([0,100])
+plt.ylim([0,2048])
+plt.zlim([-10,10])
+plt.show()
