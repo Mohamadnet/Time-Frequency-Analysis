@@ -30,3 +30,4 @@ plt.show()
 # Gabor Transform
 width = 1
 slide = np.arange(0, 10, 0.1)
+
