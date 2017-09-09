@@ -29,7 +29,7 @@ plt.plot(freq_shift, np.fft.fftshift(np.abs(fourier)), color='blue', linewidth=1
 plt.show()
 
 # Gabor Transform
-width = 1
+width = 0.3
 slide = np.arange(0, 10, 0.1)
 spec = np.zeros(shape=(len(slide),len(time)))
 plt.figure(2)
@@ -53,14 +53,15 @@ for i in range(len(slide)):
     plt.pause(0.005)
     plt.clf()
 
-# plotting the spectrum
+# plotting the spectrogram
 
-x, y = np.mgrid[:len(spec[:,1]), :len(spec[1,:])]   # 100 , 2048
+slide_mesh, freq_mesh = np.meshgrid(slide, freq_shift)
+#x, y = np.mgrid[:len(spec[:,1]), :len(spec[1,:])]   # 100 , 2048
 
 fig, ax = plt.subplots()
 ax.set_yscale('symlog')
-ax.pcolormesh(x , y, spec)
-plt.xlim([0,100])
-plt.ylim([800,1400])
+ax.pcolormesh(slide_mesh, freq_mesh, spec.transpose())
+plt.xlim([0,10])
+plt.ylim([-60,60])
 #ٍplt.zlim([-10,10])
 plt.show()
