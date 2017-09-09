@@ -48,10 +48,9 @@ for i in range(len(slide)):
     plt.subplot(313)
     plt.plot(freq_shift, np.fft.fftshift(np.abs(fourier_filterr)), color='green', linewidth=1)
 
-    spec[i, :] = np.fft.fftshift(np.abs(fourier_filterr))
-
+    spec[i, :] = np.fft.fftshift(np.abs(fourier_filterr)).reshape(-1)
     plt.xlim(-T , T )
-    plt.pause(0.1)
+    plt.pause(0.005)
     plt.clf()
 
 # plotting the spectrum
@@ -60,8 +59,8 @@ x, y = np.mgrid[:len(spec[:,1]), :len(spec[1,:])]   # 100 , 2048
 
 fig, ax = plt.subplots()
 ax.set_yscale('symlog')
-ax.pcolormesh(x, y, spec)
+ax.pcolormesh(x , y, spec)
 plt.xlim([0,100])
-plt.ylim([0,2048])
-plt.zlim([-10,10])
+plt.ylim([800,1400])
+#ٍplt.zlim([-10,10])
 plt.show()
