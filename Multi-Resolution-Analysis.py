@@ -56,7 +56,6 @@ for i in range(len(slide)):
 # plotting the spectrogram
 
 slide_mesh, freq_mesh = np.meshgrid(slide, freq_shift)
-#x, y = np.mgrid[:len(spec[:,1]), :len(spec[1,:])]   # 100 , 2048
 
 fig, ax = plt.subplots()
 ax.set_yscale('symlog')
